@@ -2,12 +2,19 @@ import express from "express";
 import {
   getTopSoftwareByCategory,
   addSoftware,
+  getAllSoftwareByCategoryWithPagination,
 } from "../Controllers/softwareController.js";
 import upload from "../Middlewares/upload.js";
 
 const softwareRouter = express.Router();
 
-softwareRouter.post("/software", upload.single("image"), addSoftware);
-softwareRouter.get("/:categoryId/top-software", getTopSoftwareByCategory);
+softwareRouter.post("/add-software", upload.single("image"), addSoftware);
+//to get top 6 softwares by category
+softwareRouter.get("/:categoryId/get-top-software", getTopSoftwareByCategory);
+//to get all softwares with pagination by category (20 per page)
+softwareRouter.get(
+  "/:categoryId/get-all-softwares",
+  getAllSoftwareByCategoryWithPagination
+);
 
 export default softwareRouter;

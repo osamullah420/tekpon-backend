@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 
-const CategorySchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  createdAt: { type: Date, default: Date.now },
+const categorySchema = new mongoose.Schema({
+  name: String,
+  description: String,
 });
 
-const Category = mongoose.model("Category", CategorySchema);
+// Use the existing model if it exists; otherwise, create a new one
+const Category =
+  mongoose.models.Category || mongoose.model("Category", categorySchema);
 
 export default Category;

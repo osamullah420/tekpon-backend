@@ -1,5 +1,5 @@
-import Category from "../models/categoryModel.js";
-import SubCategory from "../models/subCategoryModel.js";
+import Category from "../Models/categoryModel.js";
+import SubCategory from "../Models/subCategoryModel.js";
 
 export const getSubCategoriesByCategory = async (req, res) => {
   const { categoryId } = req.params;
@@ -15,9 +15,8 @@ export const getSubCategoriesByCategory = async (req, res) => {
 
     // Fetch only 6 subcategories, sorted alphabetically by name
     const subCategories = await SubCategory.find({ category: categoryId })
-      .select("name description")
-      .sort({ name: 1 })
-      .limit(6);
+      .select("_id name")
+      .sort({ name: 1 });
 
     res.status(200).json({
       success: true,
@@ -68,6 +67,65 @@ export const getAllSubCategories = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch subcategories!",
+      error: error.message,
+    });
+  }
+};
+
+export const addSubCategory = async (req, res) => {
+  const { name, description, categoryId } = req.body;
+
+  try {
+    // Check if all fields are provided
+    if (!name || !description || !categoryId) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields (name, description, categoryId) are required.",
+      });
+    }
+
+    // Check if the category exists
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found.",
+      });
+    }
+
+    // Check if the subcategory already exists in this category
+    const existingSubCategory = await SubCategory.findOne({
+      name: name.trim(),
+      category: categoryId,
+    });
+
+    if (existingSubCategory) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "Subcategory with the same name already exists in this category.",
+      });
+    }
+
+    // Create a new subcategory
+    const newSubCategory = new SubCategory({
+      name: name.trim(),
+      description: description.trim(),
+      category: categoryId,
+    });
+
+    await newSubCategory.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Subcategory added successfully.",
+      data: newSubCategory,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to add subcategory.",
       error: error.message,
     });
   }

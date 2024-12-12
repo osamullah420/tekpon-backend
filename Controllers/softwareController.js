@@ -1,5 +1,5 @@
-import Category from "../models/categoryModel.js";
-import Software from "../models/softwareModel.js";
+import Category from "../Models/categoryModel.js";
+import Software from "../Models/softwareModel.js";
 
 export const addSoftware = async (req, res) => {
   const { name, description, subCategory, category, score } = req.body;
@@ -104,6 +104,55 @@ export const getTopSoftwareByCategory = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "failed to fetch the softwares!",
+      error: error.message,
+    });
+  }
+};
+
+export const getAllSoftwareByCategoryWithPagination = async (req, res) => {
+  const { categoryId } = req.params;
+  const { page = 1 } = req.query; // Default to page 1 if not provided
+
+  try {
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
+    }
+
+    // Convert page to a number and calculate the number of items to skip
+    const pageNumber = parseInt(page, 10);
+    const limit = 20;
+    const skip = (pageNumber - 1) * limit;
+
+    const totalCount = await Software.countDocuments({ category: categoryId });
+    const softwareList = await Software.find({ category: categoryId })
+      .populate({
+        path: "subCategory",
+        select: "name",
+      })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      success: true,
+      message: "Software fetched successfully",
+      data: {
+        software: softwareList,
+        pagination: {
+          totalItems: totalCount,
+          currentPage: pageNumber,
+          totalPages: Math.ceil(totalCount / limit),
+          itemsPerPage: limit,
+        },
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch the software!",
       error: error.message,
     });
   }
