@@ -22,8 +22,8 @@ const port = process.env.PORT;
 //server connection
 
 app.get("/", (req, res) => {
-  res.send(`I am running on ${port}`);
+	res.send(`I am running on ${port}`);
 });
 app.listen(port, () => {
-  console.log(`Server runnning on ${port}`);
+	console.log(`Server runnning only on  ${port}`);
 });
