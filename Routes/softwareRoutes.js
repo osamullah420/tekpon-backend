@@ -8,7 +8,7 @@ import upload from "../Middlewares/upload.js";
 
 const softwareRouter = express.Router();
 
-softwareRouter.post("/add-software", upload.single("image"), addSoftware);
+softwareRouter.post("/add-software", upload.single("imageUrl"), addSoftware);
 //to get top 6 softwares by category
 softwareRouter.get("/:categoryId/get-top-software", getTopSoftwareByCategory);
 //to get all softwares with pagination by category (20 per page)

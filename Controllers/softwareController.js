@@ -1,5 +1,5 @@
-import Category from "../Models/categoryModel.js";
 import Software from "../Models/softwareModel.js";
+import SubCategory from "../Models/subCategoryModel.js";
 
 export const addSoftware = async (req, res) => {
   const { name, description, subCategory, category, score } = req.body;
@@ -79,22 +79,19 @@ export const getTopSoftwareByCategory = async (req, res) => {
   const { categoryId } = req.params;
 
   try {
-    const category = await Category.findById(categoryId);
+    const category = await SubCategory.findById(categoryId);
     if (!category) {
       return res.status(404).json({ error: "Category not found" });
     }
 
-    const topSoftware = await Software.find({ category: categoryId })
-      .populate({
-        path: "subCategory",
-        select: "name",
-      })
+    const topSoftware = await Software.find({ subCategory: categoryId })
+      .select("name score imageUrl") // Select only name, score, and imageUrl
       .sort({ score: -1 }) // Sort by score in descending order
       .limit(6); // Limit to 6
 
     res.status(200).json({
       success: true,
-      message: "software fetched sucessfully",
+      message: "Software fetched successfully",
       data: {
         topSoftware,
       },
@@ -103,7 +100,7 @@ export const getTopSoftwareByCategory = async (req, res) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: "failed to fetch the softwares!",
+      message: "Failed to fetch the softwares!",
       error: error.message,
     });
   }
@@ -114,7 +111,7 @@ export const getAllSoftwareByCategoryWithPagination = async (req, res) => {
   const { page = 1 } = req.query; // Default to page 1 if not provided
 
   try {
-    const category = await Category.findById(categoryId);
+    const category = await SubCategory.findById(categoryId);
     if (!category) {
       return res
         .status(404)
@@ -126,8 +123,10 @@ export const getAllSoftwareByCategoryWithPagination = async (req, res) => {
     const limit = 20;
     const skip = (pageNumber - 1) * limit;
 
-    const totalCount = await Software.countDocuments({ category: categoryId });
-    const softwareList = await Software.find({ category: categoryId })
+    const totalCount = await Software.countDocuments({
+      subCategory: categoryId,
+    });
+    const softwareList = await Software.find({ subCategory: categoryId })
       .populate({
         path: "subCategory",
         select: "name",

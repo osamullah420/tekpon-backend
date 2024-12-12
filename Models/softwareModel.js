@@ -4,6 +4,11 @@ const SoftwareSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String },
   score: { type: Number },
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
   subCategory: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "SubCategory",

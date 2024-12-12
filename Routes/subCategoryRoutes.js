@@ -3,6 +3,7 @@ import {
   getSubCategoriesByCategory,
   getAllSubCategories,
   addSubCategory,
+  getTopSubCategories,
 } from "../Controllers/subCategoryController.js";
 
 const subCategoryRouter = express.Router();
@@ -17,5 +18,7 @@ subCategoryRouter.get(
 subCategoryRouter.get("/get-all-subcategories", getAllSubCategories);
 
 subCategoryRouter.post("/add-subcategory", addSubCategory);
+
+subCategoryRouter.get("/get-popular-subcategories", getTopSubCategories);
 
 export default subCategoryRouter;

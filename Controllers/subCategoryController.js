@@ -130,3 +130,58 @@ export const addSubCategory = async (req, res) => {
     });
   }
 };
+
+export const getTopSubCategories = async (req, res) => {
+  try {
+    const topSubCategories = await SubCategory.aggregate([
+      {
+        $lookup: {
+          from: "softwares",
+          localField: "_id",
+          foreignField: "subCategory",
+          as: "softwares",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$softwares",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          name: { $first: "$name" },
+          averageScore: { $avg: "$softwares.score" },
+        },
+      },
+      {
+        $sort: { averageScore: -1 },
+      },
+      {
+        $limit: 8,
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+        },
+      },
+    ]);
+    res.status(200).json({
+      success: true,
+      message: "Top subcategories fetched successfully",
+      data: {
+        subCategories: topSubCategories,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch the top subcategories!",
+      error: error.message,
+    });
+  }
+};
