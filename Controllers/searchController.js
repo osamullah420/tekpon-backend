@@ -1,5 +1,5 @@
-import SubCategory from "../Models/subCategoryModel";
-import Software from "../Models/softwareModel";
+import SubCategory from "../Models/subCategoryModel.js";
+import Software from "../Models/softwareModel.js";
 
 export const searchItems = async (req, res) => {
   const { query } = req.query;
