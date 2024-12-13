@@ -76,15 +76,15 @@ export const addSoftware = async (req, res) => {
 };
 
 export const getTopSoftwareByCategory = async (req, res) => {
-  const { categoryId } = req.params;
+  const { subcategoryId } = req.params;
 
   try {
-    const category = await SubCategory.findById(categoryId);
+    const category = await SubCategory.findById(subcategoryId);
     if (!category) {
       return res.status(404).json({ error: "Category not found" });
     }
 
-    const topSoftware = await Software.find({ subCategory: categoryId })
+    const topSoftware = await Software.find({ subCategory: subcategoryId })
       .select("name score imageUrl") // Select only name, score, and imageUrl
       .sort({ score: -1 }) // Sort by score in descending order
       .limit(6); // Limit to 6
@@ -107,11 +107,11 @@ export const getTopSoftwareByCategory = async (req, res) => {
 };
 
 export const getAllSoftwareByCategoryWithPagination = async (req, res) => {
-  const { categoryId } = req.params;
+  const { subcategoryId } = req.params;
   const { page = 1 } = req.query; // Default to page 1 if not provided
 
   try {
-    const category = await SubCategory.findById(categoryId);
+    const category = await SubCategory.findById(subcategoryId);
     if (!category) {
       return res
         .status(404)
@@ -124,9 +124,9 @@ export const getAllSoftwareByCategoryWithPagination = async (req, res) => {
     const skip = (pageNumber - 1) * limit;
 
     const totalCount = await Software.countDocuments({
-      subCategory: categoryId,
+      subCategory: subcategoryId,
     });
-    const softwareList = await Software.find({ subCategory: categoryId })
+    const softwareList = await Software.find({ subCategory: subcategoryId })
       .populate({
         path: "subCategory",
         select: "name",
