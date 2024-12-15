@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-import Admin from "../Models/adminMode.js";
-import generateToken from "../utils/generateToken.js";
+import Admin from "../Models/adminModel.js";
+import generateToken from "../Utils/generateJwtToken.js";
 
 const login = async (req, res) => {
   try {
@@ -36,7 +36,7 @@ const login = async (req, res) => {
 // Register Admin
 const register = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, role } = req.body;
 
     // Check if admin already exists
     const existingAdmin = await Admin.findOne({ username });
@@ -51,6 +51,7 @@ const register = async (req, res) => {
     // Create new admin
     const admin = new Admin({
       username,
+      role,
       password: hashedPassword,
     });
 
