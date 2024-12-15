@@ -122,7 +122,7 @@ export const deleteCategory = async (req, res) => {
     }
 
     // Remove the category (triggers pre middleware to handle related deletions)
-    await category.remove();
+    await Category.remove;
 
     res.status(200).json({
       success: true,
