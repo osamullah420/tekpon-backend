@@ -46,6 +46,28 @@ export const getAllCategoriesWithDescription = async (req, res) => {
   }
 };
 
+export const getCategoryById = async (req, res) => {
+  try {
+    // Fetch all categories, sorted alphabetically
+    const category = await Category.findById(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Category fetched successfully",
+      data: {
+        category,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch category!",
+      error: error.message,
+    });
+  }
+};
+
 export const addCategory = async (req, res) => {
   const { name, description } = req.body;
 
