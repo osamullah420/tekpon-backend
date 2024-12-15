@@ -268,7 +268,7 @@ export const deleteSubCategory = async (req, res) => {
   const { subCategoryId } = req.params;
 
   try {
-    const subCategory = await SubCategory.findById(subCategoryId);
+    const subCategory = await SubCategory.findByIdAndDelete(subCategoryId);
     if (!subCategory) {
       return res.status(404).json({
         success: false,
@@ -277,7 +277,7 @@ export const deleteSubCategory = async (req, res) => {
     }
 
     // Trigger cascading deletions
-    await subCategory.remove();
+    await subCategory.remove;
 
     res.status(200).json({
       success: true,

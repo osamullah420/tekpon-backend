@@ -159,7 +159,7 @@ export const deleteCategory = async (req, res) => {
 
   try {
     // Find the category by ID
-    const category = await Category.findById(categoryId);
+    const category = await Category.findByIdAndDelete(categoryId);
     if (!category) {
       return res.status(404).json({
         success: false,
@@ -168,7 +168,7 @@ export const deleteCategory = async (req, res) => {
     }
 
     // Remove the category (triggers pre middleware to handle related deletions)
-    await Category.remove;
+    await category.remove;
 
     res.status(200).json({
       success: true,
