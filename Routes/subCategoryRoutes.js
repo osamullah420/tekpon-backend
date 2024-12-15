@@ -4,6 +4,8 @@ import {
   getAllSubCategories,
   addSubCategory,
   getTopSubCategories,
+  deleteSubCategory,
+  updateSubCategory,
 } from "../Controllers/subCategoryController.js";
 
 const subCategoryRouter = express.Router();
@@ -20,5 +22,11 @@ subCategoryRouter.get("/get-all-subcategories", getAllSubCategories);
 subCategoryRouter.post("/add-subcategory", addSubCategory);
 
 subCategoryRouter.get("/get-popular-subcategories", getTopSubCategories);
+
+subCategoryRouter.delete(
+  "/delete-subcategory/:subCategoryId",
+  deleteSubCategory
+);
+subCategoryRouter.put("/update-subcategory/:subCategoryId", updateSubCategory);
 
 export default subCategoryRouter;

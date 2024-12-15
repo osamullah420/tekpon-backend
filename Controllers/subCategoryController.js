@@ -204,3 +204,87 @@ export const getTopSubCategories = async (req, res) => {
     });
   }
 };
+
+export const deleteSubCategory = async (req, res) => {
+  const { subCategoryId } = req.params;
+
+  try {
+    const subCategory = await SubCategory.findById(subCategoryId);
+    if (!subCategory) {
+      return res.status(404).json({
+        success: false,
+        message: "SubCategory not found.",
+      });
+    }
+
+    // Trigger cascading deletions
+    await subCategory.remove();
+
+    res.status(200).json({
+      success: true,
+      message: "SubCategory and its related software deleted successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete subcategory.",
+      error: error.message,
+    });
+  }
+};
+
+export const updateSubCategory = async (req, res) => {
+  const { subCategoryId } = req.params;
+  const { name, description, categoryId } = req.body;
+
+  try {
+    // Validate input
+    if (!name || !description || !categoryId) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields (name, description, categoryId) are required.",
+      });
+    }
+
+    // Check if the category exists
+    const categoryExists = await Category.findById(categoryId);
+    if (!categoryExists) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found.",
+      });
+    }
+
+    // Find and update the subcategory
+    const updatedSubCategory = await SubCategory.findByIdAndUpdate(
+      subCategoryId,
+      {
+        name: name.trim(),
+        description: description.trim(),
+        category: categoryId,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedSubCategory) {
+      return res.status(404).json({
+        success: false,
+        message: "SubCategory not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "SubCategory updated successfully.",
+      data: updatedSubCategory,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update subcategory.",
+      error: error.message,
+    });
+  }
+};
