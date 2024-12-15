@@ -11,6 +11,7 @@ const SoftwareSchema = new mongoose.Schema({
   },
   subCategory: {
     type: mongoose.Schema.Types.ObjectId,
+
     ref: "SubCategory",
     required: true,
   }, // Referenced to SubCategory
@@ -19,6 +20,7 @@ const SoftwareSchema = new mongoose.Schema({
 });
 
 // Prevent duplicate software in the same subcategory
+SoftwareSchema.index({ subCategory: 1, score: -1 });
 SoftwareSchema.index({ name: 1, subCategory: 1 }, { unique: true });
 
 const Software = mongoose.model("Software", SoftwareSchema);

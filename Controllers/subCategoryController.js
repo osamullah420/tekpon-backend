@@ -1,5 +1,6 @@
 import Category from "../Models/categoryModel.js";
 import SubCategory from "../Models/subCategoryModel.js";
+import Software from "../Models/softwareModel.js";
 
 export const getSubCategoriesByCategory = async (req, res) => {
   const { categoryId } = req.params;
@@ -40,21 +41,39 @@ export const getAllSubCategories = async (req, res) => {
   const limit = 24; // Subcategories per page
 
   try {
-    // Fetch subcategories with pagination
+    // Fetch paginated subcategories
     const subCategories = await SubCategory.find()
-      .select("name description category") // fields to dislplay
+      .select("name") // Fetch only the name of the subcategories
       .sort({ name: 1 })
       .skip((page - 1) * limit) // Skip records for previous pages
       .limit(limit);
 
+    // Fetch top 4 software for each subcategory
+    const subCategoriesWithTopSoftwares = await Promise.all(
+      subCategories.map(async (subcategory) => {
+        const topSoftwares = await Software.find({
+          subCategory: subcategory._id,
+        })
+          .sort({ score: -1 }) // Sort by score descending
+          .limit(4) // Limit to top 4
+          .select("_id imageUrl"); // Include only IDs and image URLs
+
+        return {
+          name: subcategory.name,
+          topSoftwares,
+        };
+      })
+    );
+
     // Count the total number of subcategories for pagination metadata
     const totalCount = await SubCategory.countDocuments();
 
+    // Construct and send the response
     res.status(200).json({
       success: true,
       message: "Subcategories fetched successfully",
       data: {
-        subCategories,
+        subCategories: subCategoriesWithTopSoftwares,
         pagination: {
           currentPage: parseInt(page),
           totalPages: Math.ceil(totalCount / limit),

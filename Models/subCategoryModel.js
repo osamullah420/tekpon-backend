@@ -11,8 +11,8 @@ const SubCategorySchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-// Prevent duplicate subcategories in the same category
 SubCategorySchema.index({ name: 1, category: 1 }, { unique: true });
+SubCategorySchema.index({ category: 1 });
 
 const SubCategory = mongoose.model("SubCategory", SubCategorySchema);
 
