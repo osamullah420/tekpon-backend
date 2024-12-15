@@ -1,19 +1,21 @@
 import express from "express";
 import {
-	getAllCategories,
-	addCategory,
-	deleteCategory,
-	updateCategory,
-	getAllCategoriesWithDescription,
+  getAllCategories,
+  getCategoryById,
+  addCategory,
+  deleteCategory,
+  updateCategory,
+  getAllCategoriesWithDescription,
 } from "../Controllers/categoryController.js";
 
 const categoryRouter = express.Router();
 
 // Route to get all categories
 categoryRouter.get("/get-all-categories", getAllCategories);
+categoryRouter.get("/get-category-by-id/:id", getCategoryById);
 categoryRouter.get(
-	"/get-all-categories-with-description",
-	getAllCategoriesWithDescription
+  "/get-all-categories-with-description",
+  getAllCategoriesWithDescription
 );
 
 categoryRouter.post("/add-category", addCategory);
