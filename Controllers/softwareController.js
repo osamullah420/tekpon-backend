@@ -205,7 +205,7 @@ export const getAllSoftwareByCategoryWithPagination = async (req, res) => {
 export const updateSoftware = async (req, res) => {
   const { id } = req.params;
   const { name, description, subCategory, category, score } = req.body;
-  const { imageUrl } = req.files || {};
+  const imageFile = req.files?.imageUrl;
 
   try {
     // Validate required fields
@@ -214,8 +214,8 @@ export const updateSoftware = async (req, res) => {
       !description &&
       !subCategory &&
       !category &&
-      !score &&
-      !imageUrl
+      score === undefined &&
+      !imageFile
     ) {
       return res.status(400).json({
         success: false,
@@ -224,10 +224,14 @@ export const updateSoftware = async (req, res) => {
     }
 
     const updates = {};
+
+    // Update fields if provided
     if (name) updates.name = name;
     if (description) updates.description = description;
     if (subCategory) updates.subCategory = subCategory;
     if (category) updates.category = category;
+
+    // Validate and update score
     if (score !== undefined) {
       const parsedScore = parseFloat(score);
       if (isNaN(parsedScore) || parsedScore < 0 || parsedScore > 10) {
@@ -239,10 +243,10 @@ export const updateSoftware = async (req, res) => {
       updates.score = parsedScore;
     }
 
-    // Upload new image if provided
-    if (imageUrl) {
-      const cloudinaryResponse = await cloudinary.uploader.upload(
-        imageUrl.tempFilePath
+    // Upload new image to Cloudinary if provided
+    if (imageFile) {
+      const cloudinaryResponse = await cloudinary.v2.uploader.upload(
+        imageFile.tempFilePath
       );
       if (!cloudinaryResponse) {
         return res.status(500).json({
@@ -250,12 +254,15 @@ export const updateSoftware = async (req, res) => {
           message: "Failed to upload the image.",
         });
       }
-      updates.imageUrl = cloudinaryResponse.secure_url;
+      updates.imageUrl = {
+        public_id: cloudinaryResponse.public_id,
+        url: cloudinaryResponse.secure_url,
+      };
     }
 
-    // Update the software entry
+    // Update the software entry in the database
     const updatedSoftware = await Software.findByIdAndUpdate(id, updates, {
-      new: true,
+      new: true, // Return the updated document
     });
 
     if (!updatedSoftware) {
@@ -294,9 +301,11 @@ export const deleteSoftware = async (req, res) => {
       });
     }
 
-    // Delete associated image from Cloudinary
-    const publicId = software.imageUrl.split("/").pop().split(".")[0]; // Extract public ID
-    await cloudinary.uploader.destroy(publicId);
+    // Delete associated image from Cloudinary using the stored `public_id`
+    const publicId = software.imageUrl.public_id; // Access `public_id` from the imageUrl object
+    if (publicId) {
+      await cloudinary.v2.uploader.destroy(publicId);
+    }
 
     // Delete the software from the database
     await Software.findByIdAndDelete(id);
