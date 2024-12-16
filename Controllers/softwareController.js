@@ -323,3 +323,29 @@ export const deleteSoftware = async (req, res) => {
     });
   }
 };
+
+export const getAllSoftwaresAdmin = async (req, res) => {
+  try {
+    // Fetch all softwares and populate category and subCategory with their id and name
+    const softwares = await Software.find()
+      .select("_id name description score category subCategory imageUrl")
+      .sort({ name: 1 })
+      .populate("category", "_id name")
+      .populate("subCategory", "_id name");
+
+    res.status(200).json({
+      success: true,
+      message: "Software fetched successfully",
+      data: {
+        softwares,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch Software!",
+      error: error.message,
+    });
+  }
+};

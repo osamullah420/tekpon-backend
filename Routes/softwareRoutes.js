@@ -6,6 +6,7 @@ import {
   getAllSoftwareByCategoryWithPagination,
   deleteSoftware,
   updateSoftware,
+  getAllSoftwaresAdmin,
 } from "../Controllers/softwareController.js";
 
 const softwareRouter = express.Router();
@@ -23,6 +24,7 @@ softwareRouter.get(
 );
 
 softwareRouter.get("/get-all-softwares", getAllSoftware);
+softwareRouter.get("/get-all-softwares-admin", getAllSoftwaresAdmin);
 
 softwareRouter.put("/update-software/:id", updateSoftware);
 softwareRouter.delete("/delete-software/:id", deleteSoftware);
