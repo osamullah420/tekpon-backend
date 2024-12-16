@@ -15,7 +15,15 @@ const SoftwareSchema = new mongoose.Schema({
     ref: "SubCategory",
     required: true,
   }, // Referenced to SubCategory
-  imageUrl: { type: String, required: true },
+  imageUrl: {
+    public_id: {
+      type: String,
+    },
+    url: {
+      type: String,
+    },
+    required: true,
+  },
   createdAt: { type: Date, default: Date.now },
 });
 
