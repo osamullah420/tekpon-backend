@@ -115,14 +115,16 @@ export const getAllSubCategoriesWithDescription = async (req, res) => {
   const limit = 24; // Subcategories per page
 
   try {
-    // Fetch paginated subcategories
+    // Fetch paginated subcategories with their parent category
     const subCategories = await SubCategory.find()
-      .select("_id name description") // Fetch only the name of the subcategories
-      .sort({ name: 1 })
+      .select("_id name description category") // Fetch only the required fields
+      .populate({
+        path: "category", // Populate the 'category' field
+        select: "_id name", // Fetch only the ID and name of the category
+      })
+      .sort({ name: 1 }) // Sort alphabetically by name
       .skip((page - 1) * limit) // Skip records for previous pages
       .limit(limit);
-
-    // Fetch top 4 software for each subcategory
 
     // Count the total number of subcategories for pagination metadata
     const totalCount = await SubCategory.countDocuments();
@@ -134,7 +136,7 @@ export const getAllSubCategoriesWithDescription = async (req, res) => {
       data: {
         subCategories,
         pagination: {
-          currentPage: parseInt(page),
+          currentPage: parseInt(page, 10),
           totalPages: Math.ceil(totalCount / limit),
           totalCount,
         },
