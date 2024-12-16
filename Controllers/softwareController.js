@@ -1,9 +1,9 @@
 import Software from "../Models/softwareModel.js";
 import SubCategory from "../Models/subCategoryModel.js";
 import cloudinary from "cloudinary";
+
 export const addSoftware = async (req, res) => {
   const { name, description, subCategory, category, score } = req.body;
-  const { imageUrl } = req.files;
 
   try {
     // Validate required fields
@@ -21,12 +21,17 @@ export const addSoftware = async (req, res) => {
       });
     }
 
-    if (!req.file || !req.file.path) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Image is required" });
+    // Validate file upload
+    if (!req.files || !req.files.imageUrl) {
+      return res.status(400).json({
+        success: false,
+        message: "Image is required.",
+      });
     }
 
+    const imageFile = req.files.imageUrl;
+
+    // Parse score and validate
     const parsedScore = parseFloat(score);
     if (isNaN(parsedScore) || parsedScore < 0 || parsedScore > 10) {
       return res.status(400).json({
@@ -48,15 +53,16 @@ export const addSoftware = async (req, res) => {
       });
     }
 
-    const CloudinaryResponse = await cloudinary.uploader.upload(
-      imageUrl.tempFilePath
+    // Upload image to Cloudinary
+    const cloudinaryResponse = await cloudinary.v2.uploader.upload(
+      imageFile.tempFilePath
     );
 
-    if (!CloudinaryResponse) {
-      console.error(
-        "Cloudinary error : ",
-        CloudinaryResponse.error || "unknown cloudinary error!"
-      );
+    if (!cloudinaryResponse) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to upload image to Cloudinary.",
+      });
     }
 
     // Create a new software entry
@@ -65,8 +71,11 @@ export const addSoftware = async (req, res) => {
       description,
       subCategory,
       category,
-      score,
-      imageUrl: req.file.path,
+      score: parsedScore,
+      imageUrl: {
+        public_id: cloudinaryResponse.public_id,
+        url: cloudinaryResponse.secure_url,
+      },
     });
 
     // Save the software in the database
@@ -74,14 +83,14 @@ export const addSoftware = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Software added successfully",
+      message: "Software added successfully.",
       data: newSoftware,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: "Failed to add software",
+      message: "Failed to add software.",
       error: error.message,
     });
   }
