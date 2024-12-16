@@ -38,7 +38,9 @@ export const getSubCategoriesByCategory = async (req, res) => {
 
 export const getSubCategoryById = async (req, res) => {
   try {
-    const subCategory = await SubCategory.findById(req.params.id);
+    const subCategory = await SubCategory.findById(req.params.id).select(
+      "_id name"
+    );
     res.status(200).json({
       success: true,
       message: "Subcategories fetched successfully",
