@@ -272,7 +272,11 @@ export const deleteSubCategory = async (req, res) => {
   const { subCategoryId } = req.params;
 
   try {
-    const subCategory = await SubCategory.findById(subCategoryId);
+    // Find and delete the subcategory
+    const subCategory = await SubCategory.findOneAndDelete({
+      _id: subCategoryId,
+    });
+
     if (!subCategory) {
       return res.status(404).json({
         success: false,
@@ -280,12 +284,9 @@ export const deleteSubCategory = async (req, res) => {
       });
     }
 
-    // Trigger cascading deletions
-    await subCategory.remove();
-
     res.status(200).json({
       success: true,
-      message: "SubCategory and its related software deleted successfully.",
+      message: "SubCategory and all related software deleted successfully.",
     });
   } catch (error) {
     console.error(error);

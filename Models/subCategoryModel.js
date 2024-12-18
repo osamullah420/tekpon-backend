@@ -11,14 +11,21 @@ const SubCategorySchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-// Middleware to delete related software
-SubCategorySchema.pre("remove", async function (next) {
+// Middleware to delete related software when a subcategory is deleted
+SubCategorySchema.pre("findOneAndDelete", async function (next) {
   const Software = mongoose.model("Software");
 
-  // Delete software linked to this subcategory
-  await Software.deleteMany({ subCategory: this._id });
+  // Get the subcategory ID
+  const subCategoryId = this._conditions._id;
 
-  next();
+  try {
+    // Delete software linked to this subcategory
+    await Software.deleteMany({ subCategory: subCategoryId });
+
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 SubCategorySchema.index({ name: 1, category: 1 }, { unique: true });

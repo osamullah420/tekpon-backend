@@ -8,21 +8,26 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Middleware to delete related subcategories and software
-categorySchema.pre("remove", async function (next) {
+// Middleware to delete related subcategories and software when a category is deleted
+categorySchema.pre("findOneAndDelete", async function (next) {
+  const Category = this.model; // The Category model itself
   const SubCategory = mongoose.model("SubCategory");
   const Software = mongoose.model("Software");
 
-  // Delete subcategories linked to this category
-  const subCategories = await SubCategory.find({ category: this._id });
-  for (const subCategory of subCategories) {
-    await subCategory.remove(); // This will trigger subcategory's pre hook
+  // Get the category ID
+  const categoryId = this._conditions._id;
+
+  try {
+    // Delete related subcategories
+    await SubCategory.deleteMany({ category: categoryId });
+
+    // Delete software related to this category
+    await Software.deleteMany({ category: categoryId });
+
+    next();
+  } catch (error) {
+    next(error);
   }
-
-  // Delete software directly linked to this category (optional redundancy)
-  await Software.deleteMany({ category: this._id });
-
-  next();
 });
 
 // Use the existing model if it exists; otherwise, create a new one
