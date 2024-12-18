@@ -8,6 +8,7 @@ import {
   deleteSubCategory,
   updateSubCategory,
   getAllSubCategoriesWithDescription,
+  getSubCategoriesForNav,
 } from "../Controllers/subCategoryController.js";
 
 const subCategoryRouter = express.Router();
@@ -16,6 +17,11 @@ const subCategoryRouter = express.Router();
 subCategoryRouter.get(
   "/:categoryId/get-sub-categories",
   getSubCategoriesByCategory
+);
+
+subCategoryRouter.get(
+  "/:categoryId/get-sub-categories-nav",
+  getSubCategoriesForNav
 );
 subCategoryRouter.get("/get-sub-category-by-id/:id", getSubCategoryById);
 

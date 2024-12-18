@@ -2,7 +2,7 @@ import Category from "../Models/categoryModel.js";
 import SubCategory from "../Models/subCategoryModel.js";
 import Software from "../Models/softwareModel.js";
 
-export const getSubCategoriesByCategory = async (req, res) => {
+export const getSubCategoriesForNav = async (req, res) => {
   const { categoryId } = req.params;
 
   try {
@@ -17,6 +17,41 @@ export const getSubCategoriesByCategory = async (req, res) => {
     const subCategories = await SubCategory.find({
       category: categoryId,
       IsNavItem: true,
+    })
+      .select("_id name")
+      .sort({ createdAt: 1 });
+
+    res.status(200).json({
+      success: true,
+      message: "Subcategories fetched successfully",
+      data: {
+        subCategories,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch the subcategories!",
+      error: error.message,
+    });
+  }
+};
+
+export const getSubCategoriesByCategory = async (req, res) => {
+  const { categoryId } = req.params;
+
+  try {
+    // Check if the category exists
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
+    }
+
+    const subCategories = await SubCategory.find({
+      category: categoryId,
     })
       .select("_id name")
       .sort({ createdAt: 1 });
