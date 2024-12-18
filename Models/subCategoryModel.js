@@ -8,6 +8,7 @@ const SubCategorySchema = new mongoose.Schema({
     ref: "Category",
     required: true,
   }, // Referenced to Category
+  IsNavItem: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 

@@ -14,8 +14,10 @@ export const getSubCategoriesByCategory = async (req, res) => {
         .json({ success: false, message: "Category not found" });
     }
 
-    // Fetch only 6 subcategories, sorted alphabetically by name
-    const subCategories = await SubCategory.find({ category: categoryId })
+    const subCategories = await SubCategory.find({
+      category: categoryId,
+      IsNavItem: true,
+    })
       .select("_id name")
       .sort({ createdAt: 1 });
 
