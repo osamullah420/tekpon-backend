@@ -1,9 +1,12 @@
 import mongoose from "mongoose";
 
-const categorySchema = new mongoose.Schema({
-  name: String,
-  description: String,
-});
+const categorySchema = new mongoose.Schema(
+  {
+    name: String,
+    description: String,
+  },
+  { timestamps: true }
+);
 
 // Middleware to delete related subcategories and software
 categorySchema.pre("remove", async function (next) {

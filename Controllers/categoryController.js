@@ -3,7 +3,9 @@ import Category from "../Models/categoryModel.js";
 export const getAllCategories = async (req, res) => {
   try {
     // Fetch all categories, sorted alphabetically
-    const categories = await Category.find().select("name").sort({ name: 1 });
+    const categories = await Category.find()
+      .select("name")
+      .sort({ createdAt: 1 });
 
     res.status(200).json({
       success: true,
