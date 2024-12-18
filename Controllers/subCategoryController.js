@@ -17,7 +17,7 @@ export const getSubCategoriesByCategory = async (req, res) => {
     // Fetch only 6 subcategories, sorted alphabetically by name
     const subCategories = await SubCategory.find({ category: categoryId })
       .select("_id name")
-      .sort({ name: 1 });
+      .sort({ createdAt: 1 });
 
     res.status(200).json({
       success: true,
